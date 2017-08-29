@@ -12,18 +12,51 @@ var COMMENTS_VARIANTS = [
 
 var picturesCount = 25;
 
+function getRandomNum() {
+  var min = 0;
+  var max;
+
+  if (arguments.length === 0 || arguments.length > 2) {
+    return 0;
+  } else {
+
+    if (arguments.length === 2) {
+      min = arguments[0];
+      max = arguments[1];
+    } else {
+      max = arguments[0];
+    }
+
+  }
+
+  return min + Math.round((max - min) * Math.random());
+}
+
+function getRandomItem(array) {
+  return array[Math.round(Math.random() * array.length) - 1];
+}
+
+function getRandomArraySlice(array, length) {
+  var newArray = [];
+  for (var i = 0; i < length; i++) {
+    newArray[i] = getRandomItem(array);
+  }
+
+  return newArray;
+}
+
 function genPictures(length) {
   var pictures = [];
-  var comments = COMMENTS_VARIANTS.slice();
-  var indexRandomOfComments;
+  var commentsRandomCount;
 
   for (var i = 0; i < length; i++) {
-    indexRandomOfComments = Math.round((comments.length - 1) * Math.random());
+    commentsRandomCount = getRandomNum(1, COMMENTS_VARIANTS.length - 1);
+
 
     pictures[i] = {
       url: 'photos/' + (i + 1) + '.jpg',
-      likes: Math.round(15 + 185 * Math.random()),
-      comments: comments.slice(indexRandomOfComments, indexRandomOfComments + (1 + Math.round(Math.random())))
+      likes: getRandomNum(15, 200),
+      comments: getRandomArraySlice(COMMENTS_VARIANTS, commentsRandomCount)
     };
   }
 
