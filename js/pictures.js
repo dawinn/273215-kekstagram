@@ -29,7 +29,7 @@ function getRandomNum(min, max) {
 }
 
 function getRandomItem(array) {
-  var index = Math.round(Math.random() * array.length) - 1;
+  var index = Math.round(Math.random() * (array.length - 1));
   var item = array[index];
   array.splice(index, 1);
   return item;
