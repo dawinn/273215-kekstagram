@@ -1,6 +1,9 @@
 // stats.js
 'use strict';
 
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+
 var COMMENTS_VARIANTS = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
@@ -56,7 +59,8 @@ function genPictures(length) {
     pictures[i] = {
       url: 'photos/' + (i + 1) + '.jpg',
       likes: getRandomNum(15, 200),
-      comments: getRandomArraySlice(comments, commentsRandomCount)
+      comments: getRandomArraySlice(comments, commentsRandomCount),
+      commentsCount: commentsRandomCount
     };
   }
 
@@ -79,6 +83,7 @@ var renderPicture = function (picture) {
   pictureElement.querySelector('img').setAttribute('src', picture.url);
   pictureElement.querySelector('.picture-likes').textContent = picture.likes;
   pictureElement.querySelector('.picture-comments').textContent = picture.comments;
+  pictureElement.querySelector('.picture-comments').setAttribute('data-count', picture.commentsCount);
 
   return pictureElement;
 };
@@ -96,7 +101,7 @@ var renderPictures = function (appendBlock, source, functionRender) {
 function genGalleryOverlay(source) {
   galleryOverlay.querySelector('.gallery-overlay-image').setAttribute('src', source.url);
   galleryOverlay.querySelector('.likes-count').textContent = source.likes;
-  galleryOverlay.querySelector('.comments-count').textContent = source.comments.length;
+  galleryOverlay.querySelector('.comments-count').textContent = source.commentsCount;
 
 }
 
@@ -105,4 +110,23 @@ formUploadOverlay.classList.add('hidden');
 renderPictures(picturesBlock, pictures, renderPicture);
 genGalleryOverlay(pictures[0]);
 
-galleryOverlay.classList.remove('hidden');
+// galleryOverlay.classList.remove('hidden');
+
+
+picturesBlock.onPictureClick = function (evt) {
+  var target = evt.target;
+
+  if (target !== this) {
+    var picture = target.closest('.picture');
+    var pictureData = {
+      url: picture.querySelector('img').getAttribute('src'),
+      likes: picture.querySelector('.picture-likes').textContent,
+      comments: picture.querySelector('.picture-comments').getAttribute('data-count')
+    };
+  }
+
+  genGalleryOverlay(pictureData);
+  galleryOverlay.classList.remove('hidden');
+};
+
+picturesBlock.addEventListener('click', picturesBlock.onPictureClick);
