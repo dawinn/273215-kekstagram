@@ -1,4 +1,3 @@
-// stats.js
 'use strict';
 
 var ESC_KEYCODE = 27;
@@ -68,8 +67,6 @@ function genPictures(length) {
 
 var pictureTemplate = document.querySelector('#picture-template').content;
 
-// var formUploadOverlay = document.querySelector('.upload-overlay');
-
 var galleryOverlay = document.querySelector('.gallery-overlay');
 galleryOverlay.setAttribute('tabindex', 0);
 
@@ -117,12 +114,8 @@ function renderGalleryOverlay(source) {
 
 }
 
-// formUploadOverlay.classList.add('hidden');
-
 renderPictures(picturesBlock, pictures, renderPicture);
 renderGalleryOverlay(getPictureData(picturesBlock.children[0]));
-
-// galleryOverlay.classList.remove('hidden');
 
 galleryOverlay.show = function () {
   galleryOverlay.classList.remove('hidden');
