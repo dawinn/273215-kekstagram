@@ -1,5 +1,7 @@
-// stats.js
 'use strict';
+
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
 
 var COMMENTS_VARIANTS = [
   'Всё отлично!',
@@ -56,7 +58,7 @@ function genPictures(length) {
     pictures[i] = {
       url: 'photos/' + (i + 1) + '.jpg',
       likes: getRandomNum(15, 200),
-      comments: getRandomArraySlice(comments, commentsRandomCount)
+      comments: getRandomArraySlice(comments, commentsRandomCount),
     };
   }
 
@@ -65,20 +67,23 @@ function genPictures(length) {
 
 var pictureTemplate = document.querySelector('#picture-template').content;
 
-var formUploadOverlay = document.querySelector('.upload-overlay');
-
 var galleryOverlay = document.querySelector('.gallery-overlay');
+galleryOverlay.setAttribute('tabindex', 0);
+
 
 var picturesBlock = document.querySelector('.pictures');
 
 var pictures = genPictures(picturesCount);
 
-var renderPicture = function (picture) {
-  var pictureElement = pictureTemplate.cloneNode(true);
+var galleryOverlayClose = galleryOverlay.querySelector('.gallery-overlay-close');
+galleryOverlayClose.setAttribute('tabindex', 0);
 
+var renderPicture = function (picture, index) {
+  var pictureElement = pictureTemplate.cloneNode(true);
+  pictureElement.querySelector('img').setAttribute('data-item', index);
   pictureElement.querySelector('img').setAttribute('src', picture.url);
   pictureElement.querySelector('.picture-likes').textContent = picture.likes;
-  pictureElement.querySelector('.picture-comments').textContent = picture.comments;
+  pictureElement.querySelector('.picture-comments').textContent = picture.comments.length;
 
   return pictureElement;
 };
@@ -86,23 +91,76 @@ var renderPicture = function (picture) {
 var renderPictures = function (appendBlock, source, functionRender) {
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < source.length; i++) {
-    fragment.appendChild(functionRender(source[i]));
+    fragment.appendChild(functionRender(source[i], i));
   }
 
   appendBlock.appendChild(fragment);
 
 };
 
-function genGalleryOverlay(source) {
+function getPictureData(source) {
+  var dataItem = {
+    url: source.querySelector('img').getAttribute('src'),
+    likes: source.querySelector('.picture-likes').textContent,
+    comments: source.querySelector('.picture-comments').textContent
+  };
+  return dataItem;
+}
+
+function renderGalleryOverlay(source) {
   galleryOverlay.querySelector('.gallery-overlay-image').setAttribute('src', source.url);
   galleryOverlay.querySelector('.likes-count').textContent = source.likes;
   galleryOverlay.querySelector('.comments-count').textContent = source.comments.length;
 
 }
 
-formUploadOverlay.classList.add('hidden');
-
 renderPictures(picturesBlock, pictures, renderPicture);
-genGalleryOverlay(pictures[0]);
+renderGalleryOverlay(pictures[0]);
 
-galleryOverlay.classList.remove('hidden');
+galleryOverlay.show = function () {
+  galleryOverlay.classList.remove('hidden');
+  document.addEventListener('keydown', galleryOverlay.onEscPress);
+};
+
+galleryOverlay.hide = function () {
+  galleryOverlay.classList.add('hidden');
+  document.removeEventListener('keydown', galleryOverlay.onEscPress);
+};
+
+galleryOverlay.onEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    galleryOverlay.hide();
+  }
+};
+
+picturesBlock.onPictureClick = function (evt) {
+  var target = evt.target;
+
+  evt.preventDefault();
+
+  if (target !== this) {
+    var picture = target.closest('.picture');
+
+    var orderPicture = picture.querySelector('img').getAttribute('data-item');
+
+    if (orderPicture >= 0 && orderPicture < pictures.length) {
+      renderGalleryOverlay(pictures[orderPicture]);
+    } else {
+      renderGalleryOverlay(getPictureData(picture));
+    }
+
+    galleryOverlay.show();
+  }
+};
+
+picturesBlock.addEventListener('click', picturesBlock.onPictureClick);
+
+galleryOverlayClose.addEventListener('click', galleryOverlay.hide);
+
+
+galleryOverlayClose.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    galleryOverlay.hide();
+  }
+});
+
