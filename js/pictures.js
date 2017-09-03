@@ -78,9 +78,9 @@ var pictures = genPictures(picturesCount);
 var galleryOverlayClose = galleryOverlay.querySelector('.gallery-overlay-close');
 galleryOverlayClose.setAttribute('tabindex', 0);
 
-var renderPicture = function (picture) {
+var renderPicture = function (picture, index) {
   var pictureElement = pictureTemplate.cloneNode(true);
-
+  pictureElement.querySelector('img').setAttribute('data-item', index);
   pictureElement.querySelector('img').setAttribute('src', picture.url);
   pictureElement.querySelector('.picture-likes').textContent = picture.likes;
   pictureElement.querySelector('.picture-comments').textContent = picture.comments.length;
@@ -91,7 +91,7 @@ var renderPicture = function (picture) {
 var renderPictures = function (appendBlock, source, functionRender) {
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < source.length; i++) {
-    fragment.appendChild(functionRender(source[i]));
+    fragment.appendChild(functionRender(source[i], i));
   }
 
   appendBlock.appendChild(fragment);
@@ -110,12 +110,12 @@ function getPictureData(source) {
 function renderGalleryOverlay(source) {
   galleryOverlay.querySelector('.gallery-overlay-image').setAttribute('src', source.url);
   galleryOverlay.querySelector('.likes-count').textContent = source.likes;
-  galleryOverlay.querySelector('.comments-count').textContent = source.comments;
+  galleryOverlay.querySelector('.comments-count').textContent = source.comments.length;
 
 }
 
 renderPictures(picturesBlock, pictures, renderPicture);
-renderGalleryOverlay(getPictureData(picturesBlock.children[0]));
+renderGalleryOverlay(pictures[0]);
 
 galleryOverlay.show = function () {
   galleryOverlay.classList.remove('hidden');
@@ -141,7 +141,14 @@ picturesBlock.onPictureClick = function (evt) {
   if (target !== this) {
     var picture = target.closest('.picture');
 
-    renderGalleryOverlay(getPictureData(picture));
+    var orderPicture = picture.querySelector('img').getAttribute('data-item');
+
+    if (orderPicture >= 0 && orderPicture < pictures.length) {
+      renderGalleryOverlay(pictures[orderPicture]);
+    } else {
+      renderGalleryOverlay(getPictureData(picture));
+    }
+
     galleryOverlay.show();
   }
 };
