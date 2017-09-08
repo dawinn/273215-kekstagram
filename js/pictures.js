@@ -247,19 +247,16 @@ btnCancelUploadForm.addEventListener('keydown', function (evt) {
   }
 });
 
-
-uploadForm.valid = false;
-
 btnResizeControlsDec.addEventListener('click', function (evt) {
   var value = parseInt(inputResizesValue.value, 10) - RESIZE.STEP;
-  value = (value < RESIZE.MIN ? RESIZE.MIN : value);
+  value = Math.min(value, RESIZE.MIN);
   inputResizesValue.value = value + '%';
   previewUploadForm.style = 'transform: scale(' + value * 0.01 + ')';
 });
 
 btnResizeControlsInc.addEventListener('click', function (evt) {
   var value = parseInt(inputResizesValue.value, 10) + RESIZE.STEP;
-  value = (value >= RESIZE.MAX ? RESIZE.MAX : value);
+  value = Math.max(value, RESIZE.MIN);
   inputResizesValue.value = value + '%';
   previewUploadForm.style = 'transform: scale(' + value * 0.01 + ')';
 });
@@ -272,46 +269,60 @@ function showError(elem) {
   if (!elem.classList.contains('upload-message-error')) {
     elem.classList.add('upload-message-error');
   }
-  uploadForm.valid = false;
 }
 
 function resetError(elem) {
   if (elem.classList.contains('upload-message-error')) {
     elem.classList.remove('upload-message-error');
   }
-  uploadForm.valid = true;
 }
 
-uploadForm.validation = function () {
-  var hashArray = [];
+inputDescriptionUploadForm.validation = function () {
+  var valid = true;
 
   resetError(inputDescriptionUploadForm);
-  if (inputDescriptionUploadForm.value.length < DESCRIPTION.MIN) {
+  if (inputDescriptionUploadForm.value.length > 0 && inputDescriptionUploadForm.value.length < DESCRIPTION.MIN) {
     showError(inputDescriptionUploadForm);
+    valid = false;
   } else {
     if (inputDescriptionUploadForm.value.length > DESCRIPTION.MAX) {
       showError(inputDescriptionUploadForm);
+      valid = false;
     }
   }
 
+  return valid;
+};
+
+inputResizesValue.validation = function () {
   resetError(inputResizesValue);
+
   if (inputResizesValue.value < RESIZE.MIN
     || inputResizesValue.value > RESIZE.MAX
     || inputResizesValue.value % RESIZE.STEP > 0) {
-
     showError(inputResizesValue);
+    return false;
   }
+
+  return true;
+};
+
+inputHashTags.validation = function () {
+  var valid = true;
+  var hashArray = [];
 
   resetError(inputHashTags);
   var regex = new RegExp(/([^$A-Za-z0-9А-Яа-я_# ]+)/);
 
   if (regex.test(inputHashTags.value)) {
     showError(inputHashTags);
+    valid = false;
   } else {
     hashArray = inputHashTags.value.split(' ');
     if (hashArray.length !== 0) {
       if (hashArray.length > HASHTAGS.COUNTS) {
         showError(inputHashTags);
+        valid = false;
       } else {
 
         var obj = {};
@@ -319,6 +330,7 @@ uploadForm.validation = function () {
         for (var i = 0; i < hashArray.length; i++) {
           if (hashArray[i][0] !== '#' || hashArray[i].length > HASHTAGS.MAX_LENGTH) {
             showError(inputHashTags);
+            valid = false;
             break;
           }
           obj[hashArray[i]] = 1;
@@ -326,18 +338,25 @@ uploadForm.validation = function () {
 
         if (Object.keys(obj).length !== hashArray.length) {
           showError(inputHashTags);
+          valid = false;
         }
 
       }
     }
   }
 
+  return valid;
+};
+
+uploadForm.validation = function () {
+
+
   return uploadForm.valid;
 };
 
 uploadForm.onSubmit = function (evt) {
 
-  if (!uploadForm.validation()) {
+  if (!(inputDescriptionUploadForm.validation() & inputResizesValue.validation() & inputHashTags.validation())) {
     evt.preventDefault();
   }
 
