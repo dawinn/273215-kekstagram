@@ -1,7 +1,30 @@
 'use strict';
 
-var ESC_KEYCODE = 27;
-var ENTER_KEYCODE = 13;
+var KEYCODE = {
+  ESC: 27,
+  ENTER: 13
+};
+
+var RESIZE = {
+  MIN: 25,
+  MAX: 100,
+  STEP: 25
+};
+
+var DESCRIPTION = {
+  MIN: 30,
+  MAX: 100,
+};
+
+var COMMENTS = {
+  MIN: 15,
+  MAX: 200
+};
+
+var HASHTAGS = {
+  MAX_LENGTH: 20,
+  COUNTS: 5
+};
 
 var COMMENTS_VARIANTS = [
   'Всё отлично!',
@@ -57,7 +80,7 @@ function genPictures(length) {
 
     pictures[i] = {
       url: 'photos/' + (i + 1) + '.jpg',
-      likes: getRandomNum(15, 200),
+      likes: getRandomNum(COMMENTS.MIN, COMMENTS.MAX),
       comments: getRandomArraySlice(comments, commentsRandomCount),
     };
   }
@@ -128,7 +151,7 @@ galleryOverlay.hide = function () {
 };
 
 galleryOverlay.onEscPress = function (evt) {
-  if (evt.keyCode === ESC_KEYCODE) {
+  if (evt.keyCode === KEYCODE.ESC) {
     galleryOverlay.hide();
   }
 };
@@ -159,8 +182,165 @@ galleryOverlayClose.addEventListener('click', galleryOverlay.hide);
 
 
 galleryOverlayClose.addEventListener('keydown', function (evt) {
-  if (evt.keyCode === ENTER_KEYCODE) {
+  if (evt.keyCode === KEYCODE.ENTER) {
     galleryOverlay.hide();
   }
 });
 
+
+// upload form
+
+var uploadForm = document.getElementById('upload-select-image');
+var uploadImage = uploadForm.querySelector('.upload-image');
+var inputFileUploadForm = uploadImage.querySelector('#upload-file');
+var overlayBlockUploadForm = uploadForm.querySelector('.upload-overlay');
+
+var btnCancelUploadForm = uploadForm.querySelector('.upload-form-cancel');
+btnCancelUploadForm.setAttribute('tabindex', 0);
+
+var inputDescriptionUploadForm = overlayBlockUploadForm.querySelector('.upload-form-description');
+var inputResizesValue = overlayBlockUploadForm.querySelector('.upload-resize-controls-value');
+var btnResizeControlsDec = overlayBlockUploadForm.querySelector('.upload-resize-controls-button-dec');
+var btnResizeControlsInc = overlayBlockUploadForm.querySelector('.upload-resize-controls-button-inc');
+var previewUploadForm = overlayBlockUploadForm.querySelector('.upload-form-preview');
+var inputHashTags = overlayBlockUploadForm.querySelector('.upload-form-hashtags');
+var btnSubmit = uploadForm.querySelector('.upload-form-submit');
+var effectControls = overlayBlockUploadForm.querySelector('.upload-effect-controls');
+
+var show = function (nameBlock) {
+  if (nameBlock.classList.contains('hidden')) {
+    nameBlock.classList.remove('hidden');
+  }
+};
+
+var hide = function (nameBlock) {
+  if (!nameBlock.classList.contains('hidden')) {
+    nameBlock.classList.add('hidden');
+  }
+};
+
+inputFileUploadForm.onChange = function (evt) {
+  hide(uploadImage);
+  show(overlayBlockUploadForm);
+  document.addEventListener('keydown', overlayBlockUploadForm.onEscPress);
+};
+
+btnCancelUploadForm.onCancel = function () {
+  show(uploadImage);
+  hide(overlayBlockUploadForm);
+  document.removeEventListener('keydown', overlayBlockUploadForm.onEscPress);
+};
+
+overlayBlockUploadForm.onEscPress = function (evt) {
+  if (evt.keyCode === KEYCODE.ESC && evt.target !== inputDescriptionUploadForm) {
+    btnCancelUploadForm.onCancel();
+  }
+};
+
+inputFileUploadForm.addEventListener('change', inputFileUploadForm.onChange);
+
+btnCancelUploadForm.addEventListener('click', btnCancelUploadForm.onCancel);
+
+btnCancelUploadForm.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === KEYCODE.ENTER) {
+    btnCancelUploadForm.onCancel();
+  }
+});
+
+
+uploadForm.valid = false;
+
+btnResizeControlsDec.addEventListener('click', function (evt) {
+  var value = parseInt(inputResizesValue.value, 10) - RESIZE.STEP;
+  value = (value < RESIZE.MIN ? RESIZE.MIN : value);
+  inputResizesValue.value = value + '%';
+  previewUploadForm.style = 'transform: scale(' + value * 0.01 + ')';
+});
+
+btnResizeControlsInc.addEventListener('click', function (evt) {
+  var value = parseInt(inputResizesValue.value, 10) + RESIZE.STEP;
+  value = (value >= RESIZE.MAX ? RESIZE.MAX : value);
+  inputResizesValue.value = value + '%';
+  previewUploadForm.style = 'transform: scale(' + value * 0.01 + ')';
+});
+
+effectControls.addEventListener('change', function (evt) {
+  previewUploadForm.className = previewUploadForm.classList[0] + ' effect-' + evt.target.value;
+});
+
+function showError(elem) {
+  if (!elem.classList.contains('upload-message-error')) {
+    elem.classList.add('upload-message-error');
+  }
+  uploadForm.valid = false;
+}
+
+function resetError(elem) {
+  if (elem.classList.contains('upload-message-error')) {
+    elem.classList.remove('upload-message-error');
+  }
+  uploadForm.valid = true;
+}
+
+uploadForm.validation = function () {
+  var hashArray = [];
+
+  resetError(inputDescriptionUploadForm);
+  if (inputDescriptionUploadForm.value.length < DESCRIPTION.MIN) {
+    showError(inputDescriptionUploadForm);
+  } else {
+    if (inputDescriptionUploadForm.value.length > DESCRIPTION.MAX) {
+      showError(inputDescriptionUploadForm);
+    }
+  }
+
+  resetError(inputResizesValue);
+  if (inputResizesValue.value < RESIZE.MIN
+    || inputResizesValue.value > RESIZE.MAX
+    || inputResizesValue.value % RESIZE.STEP > 0) {
+
+    showError(inputResizesValue);
+  }
+
+  resetError(inputHashTags);
+  var regex = new RegExp(/([^$A-Za-z0-9А-Яа-я_# ]+)/);
+
+  if (regex.test(inputHashTags.value)) {
+    showError(inputHashTags);
+  } else {
+    hashArray = inputHashTags.value.split(' ');
+    if (hashArray.length !== 0) {
+      if (hashArray.length > HASHTAGS.COUNTS) {
+        showError(inputHashTags);
+      } else {
+
+        var obj = {};
+
+        for (var i = 0; i < hashArray.length; i++) {
+          if (hashArray[i][0] !== '#' || hashArray[i].length > HASHTAGS.MAX_LENGTH) {
+            showError(inputHashTags);
+            break;
+          }
+          obj[hashArray[i]] = 1;
+        }
+
+        if (Object.keys(obj).length !== hashArray.length) {
+          showError(inputHashTags);
+        }
+
+      }
+    }
+  }
+
+  return uploadForm.valid;
+};
+
+uploadForm.onSubmit = function (evt) {
+
+  if (!uploadForm.validation()) {
+    evt.preventDefault();
+  }
+
+};
+
+btnSubmit.addEventListener('click', uploadForm.onSubmit);
