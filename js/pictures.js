@@ -12,8 +12,8 @@ var RESIZE = {
 };
 
 var DESCRIPTION = {
-  MIN: 30,
-  MAX: 100,
+  MIN: 0,
+  MAX: 140,
 };
 
 var COMMENTS = {
