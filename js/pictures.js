@@ -249,14 +249,14 @@ btnCancelUploadForm.addEventListener('keydown', function (evt) {
 
 btnResizeControlsDec.addEventListener('click', function (evt) {
   var value = parseInt(inputResizesValue.value, 10) - RESIZE.STEP;
-  value = Math.min(value, RESIZE.MIN);
+  value = Math.max(value, RESIZE.MIN);
   inputResizesValue.value = value + '%';
   previewUploadForm.style = 'transform: scale(' + value * 0.01 + ')';
 });
 
 btnResizeControlsInc.addEventListener('click', function (evt) {
   var value = parseInt(inputResizesValue.value, 10) + RESIZE.STEP;
-  value = Math.max(value, RESIZE.MIN);
+  value = Math.min(value, RESIZE.MAX);
   inputResizesValue.value = value + '%';
   previewUploadForm.style = 'transform: scale(' + value * 0.01 + ')';
 });
@@ -310,9 +310,12 @@ inputResizesValue.validation = function () {
 inputHashTags.validation = function () {
   var valid = true;
   var hashArray = [];
+  var regex = new RegExp(/([^$A-Za-z0-9А-Яа-я_# ]+)/);
 
   resetError(inputHashTags);
-  var regex = new RegExp(/([^$A-Za-z0-9А-Яа-я_# ]+)/);
+  if (inputHashTags.value.length === 0) {
+    return valid;
+  }
 
   if (regex.test(inputHashTags.value)) {
     showError(inputHashTags);
