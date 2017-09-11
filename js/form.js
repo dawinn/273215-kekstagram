@@ -33,7 +33,37 @@
   var previewUploadForm = overlayBlockUploadForm.querySelector('.upload-form-preview');
   var inputHashTags = overlayBlockUploadForm.querySelector('.upload-form-hashtags');
   var btnSubmit = uploadForm.querySelector('.upload-form-submit');
+
+  var effectControlsData = {
+    VALUE_DEFAULT: 20,
+    value: 20,
+    chosenFilter: '',
+    FILTER_TYPES: {
+      'chrome': function () {
+        return 'grayscale(' + effectControlsData.value / 100 + ')';
+      },
+
+      'sepia': function () {
+        return 'sepia(' + effectControlsData.value / 100 + ')';
+      },
+
+      'marvin': function () {
+        return 'invert(' + effectControlsData.value + '%)';
+      },
+
+      'phobos': function () {
+        return 'blur(' + Math.round(effectControlsData.value * 0.03) + 'px)';
+      },
+
+      'heat': function () {
+        return 'brightness(' + effectControlsData.value * 0.03 + ')';
+      }
+    }
+  };
+
   var effectControls = overlayBlockUploadForm.querySelector('.upload-effect-controls');
+  var effectControlsLevelPin = effectControls.querySelector('.upload-effect-level-pin');
+  var effectControlsLevelVal = effectControls.querySelector('.upload-effect-level-val');
 
   var show = function (nameBlock) {
     if (nameBlock.classList.contains('hidden')) {
@@ -89,6 +119,7 @@
 
   effectControls.addEventListener('change', function (evt) {
     previewUploadForm.className = previewUploadForm.classList[0] + ' effect-' + evt.target.value;
+    effectControlsData.setEffectType(evt.target.value);
   });
 
   function showError(elem) {
@@ -186,5 +217,62 @@
   };
 
   btnSubmit.addEventListener('click', uploadForm.onSubmit);
+
+
+  function setPinPosition(value) {
+    effectControlsLevelPin.style.left = value + '%';
+    effectControlsLevelVal.style.width = value + '%';
+  }
+
+  effectControlsData.setEffectType = function (value) {
+    effectControlsData.chosenFilter = value;
+    effectControlsData.value = effectControlsData.VALUE_DEFAULT;
+    if (value === 'none') {
+      effectControlsLevelPin.closest('.upload-effect-level').classList.add('hidden');
+    } else {
+      effectControlsLevelPin.closest('.upload-effect-level').classList.remove('hidden');
+      setPinPosition(effectControlsData.value);
+    }
+
+    previewUploadForm.style.filter = effectControlsData.FILTER_TYPES[effectControlsData.chosenFilter]();
+  };
+
+  effectControlsData.setEffectValue = function (value) {
+    effectControlsData.value = value;
+    previewUploadForm.style.filter = effectControlsData.FILTER_TYPES[effectControlsData.chosenFilter]();
+    setPinPosition(value);
+  };
+
+  effectControlsLevelPin.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+
+    var startCoords = {
+      x: evt.clientX
+    };
+
+    var onMouseMove = function (moveEvt) {
+      moveEvt.preventDefault();
+
+      var shift = {
+        x: startCoords.x - moveEvt.clientX
+      };
+
+      startCoords = {
+        x: moveEvt.clientX
+      };
+
+      effectControlsData.setEffectValue(Math.max(0, Math.min(100, Math.round((effectControlsLevelPin.offsetLeft - shift.x)) / 4.55)));
+    };
+
+    var onMouseUp = function (upEvt) {
+      upEvt.preventDefault();
+
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
 
 })();
