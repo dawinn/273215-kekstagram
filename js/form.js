@@ -28,8 +28,9 @@
 
   var inputDescriptionUploadForm = overlayBlockUploadForm.querySelector('.upload-form-description');
   var inputResizesValue = overlayBlockUploadForm.querySelector('.upload-resize-controls-value');
-  var btnResizeControlsDec = overlayBlockUploadForm.querySelector('.upload-resize-controls-button-dec');
-  var btnResizeControlsInc = overlayBlockUploadForm.querySelector('.upload-resize-controls-button-inc');
+
+  var resizeControls = overlayBlockUploadForm.querySelector('.upload-resize-controls');
+
   var previewUploadForm = overlayBlockUploadForm.querySelector('.upload-form-preview');
   var inputHashTags = overlayBlockUploadForm.querySelector('.upload-form-hashtags');
   var btnSubmit = uploadForm.querySelector('.upload-form-submit');
@@ -103,19 +104,12 @@
     window.utils.isEnterEvent(evt, btnCancelUploadForm.onCancel);
   });
 
-  btnResizeControlsDec.addEventListener('click', function (evt) {
-    var value = parseInt(inputResizesValue.value, 10) - RESIZE.STEP;
-    value = Math.max(value, RESIZE.MIN);
-    inputResizesValue.value = value + '%';
-    previewUploadForm.style = 'transform: scale(' + value * 0.01 + ')';
-  });
+  var setScale = function (scale) {
+    previewUploadForm.style.transform = 'scale(' + scale * 0.01 + ')';
+    inputResizesValue.value = scale + '%';
+  };
 
-  btnResizeControlsInc.addEventListener('click', function (evt) {
-    var value = parseInt(inputResizesValue.value, 10) + RESIZE.STEP;
-    value = Math.min(value, RESIZE.MAX);
-    inputResizesValue.value = value + '%';
-    previewUploadForm.style = 'transform: scale(' + value * 0.01 + ')';
-  });
+  window.initializeScale(resizeControls, setScale);
 
   effectControls.addEventListener('change', function (evt) {
     previewUploadForm.className = previewUploadForm.classList[0] + ' effect-' + evt.target.value;
