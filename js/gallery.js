@@ -2,8 +2,6 @@
 
 (function () {
 
-  // var pictureTemplate = document.querySelector('#picture-template').content;
-
   var galleryOverlay = document.querySelector('.gallery-overlay');
   galleryOverlay.setAttribute('tabindex', 0);
 
@@ -12,19 +10,16 @@
   var galleryOverlayClose = galleryOverlay.querySelector('.gallery-overlay-close');
   galleryOverlayClose.setAttribute('tabindex', 0);
 
-  var pictures = window.data;
-
   var renderPictures = function (appendBlock, source, functionRender) {
     var fragment = document.createDocumentFragment();
+
     for (var i = 0; i < source.length; i++) {
       if (typeof functionRender === 'function') {
         fragment.appendChild(functionRender(source[i], i));
       }
-
     }
 
     appendBlock.appendChild(fragment);
-
   };
 
   function getPictureData(source) {
@@ -36,9 +31,6 @@
     return dataItem;
   }
 
-  renderPictures(picturesBlock, pictures, window.renderPicture);
-
-
   galleryOverlay.show = function () {
     galleryOverlay.classList.remove('hidden');
     document.addEventListener('keydown', galleryOverlay.onEscPress);
@@ -48,6 +40,15 @@
     galleryOverlay.classList.add('hidden');
     document.removeEventListener('keydown', galleryOverlay.onEscPress);
   };
+
+  var pictures = [];
+  var successHendler = function (data) {
+    pictures = data;
+    renderPictures(picturesBlock, data, window.renderPicture);
+  };
+
+  window.backend.load(successHendler, window.utils.errorHandler);
+
 
   galleryOverlay.onEscPress = function (evt) {
     window.utils.isEscEvent(evt, galleryOverlay.hide);
@@ -76,7 +77,6 @@
   picturesBlock.addEventListener('click', picturesBlock.onPictureClick);
 
   galleryOverlayClose.addEventListener('click', galleryOverlay.hide);
-
 
   galleryOverlayClose.addEventListener('keydown', function (evt) {
     window.utils.isEnterEvent(evt, galleryOverlay.hide);

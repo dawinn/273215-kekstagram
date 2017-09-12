@@ -10,6 +10,9 @@
 
   window.initializeScale = function (elem, callback) {
 
+    elem.getElementsByTagName('input').scale.value = '100%';
+    callback(100);
+
     elem.addEventListener('click', function (evt) {
       evt.preventDefault();
       var value = parseInt(elem.getElementsByTagName('input').scale.value, 10);
