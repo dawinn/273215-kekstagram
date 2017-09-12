@@ -8,23 +8,23 @@
     chosenFilter: '',
     FILTER_TYPES: {
       'chrome': function () {
-        return 'filter: grayscale(' + effectControlsData.value / 100 + ')';
+        return ' grayscale(' + effectControlsData.value / 100 + ')';
       },
 
       'sepia': function () {
-        return 'filter: sepia(' + effectControlsData.value / 100 + ')';
+        return ' sepia(' + effectControlsData.value / 100 + ')';
       },
 
       'marvin': function () {
-        return 'filter: invert(' + effectControlsData.value + '%)';
+        return ' invert(' + effectControlsData.value + '%)';
       },
 
       'phobos': function () {
-        return 'filter: blur(' + Math.round(effectControlsData.value * 0.03) + 'px)';
+        return ' blur(' + Math.round(effectControlsData.value * 0.03) + 'px)';
       },
 
       'heat': function () {
-        return 'filter: brightness(' + effectControlsData.value * 0.03 + ')';
+        return ' brightness(' + effectControlsData.value * 0.03 + ')';
       }
     }
   };

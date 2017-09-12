@@ -180,7 +180,7 @@
 
   function applyFilterHandler(filter, value) {
     previewUploadForm.className = previewUploadForm.classList[0] + ' effect-' + filter;
-    previewUploadForm.style = value;
+    previewUploadForm.style.filter = value;
   }
 
   window.initializeFilters(effectControls, applyFilterHandler);
