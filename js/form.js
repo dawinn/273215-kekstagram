@@ -28,42 +28,14 @@
 
   var inputDescriptionUploadForm = overlayBlockUploadForm.querySelector('.upload-form-description');
   var inputResizesValue = overlayBlockUploadForm.querySelector('.upload-resize-controls-value');
-  var btnResizeControlsDec = overlayBlockUploadForm.querySelector('.upload-resize-controls-button-dec');
-  var btnResizeControlsInc = overlayBlockUploadForm.querySelector('.upload-resize-controls-button-inc');
+
+  var resizeControls = overlayBlockUploadForm.querySelector('.upload-resize-controls');
+
   var previewUploadForm = overlayBlockUploadForm.querySelector('.upload-form-preview');
   var inputHashTags = overlayBlockUploadForm.querySelector('.upload-form-hashtags');
   var btnSubmit = uploadForm.querySelector('.upload-form-submit');
 
-  var effectControlsData = {
-    VALUE_DEFAULT: 20,
-    value: 20,
-    chosenFilter: '',
-    FILTER_TYPES: {
-      'chrome': function () {
-        return 'grayscale(' + effectControlsData.value / 100 + ')';
-      },
-
-      'sepia': function () {
-        return 'sepia(' + effectControlsData.value / 100 + ')';
-      },
-
-      'marvin': function () {
-        return 'invert(' + effectControlsData.value + '%)';
-      },
-
-      'phobos': function () {
-        return 'blur(' + Math.round(effectControlsData.value * 0.03) + 'px)';
-      },
-
-      'heat': function () {
-        return 'brightness(' + effectControlsData.value * 0.03 + ')';
-      }
-    }
-  };
-
   var effectControls = overlayBlockUploadForm.querySelector('.upload-effect-controls');
-  var effectControlsLevelPin = effectControls.querySelector('.upload-effect-level-pin');
-  var effectControlsLevelVal = effectControls.querySelector('.upload-effect-level-val');
 
   var show = function (nameBlock) {
     if (nameBlock.classList.contains('hidden')) {
@@ -103,24 +75,12 @@
     window.utils.isEnterEvent(evt, btnCancelUploadForm.onCancel);
   });
 
-  btnResizeControlsDec.addEventListener('click', function (evt) {
-    var value = parseInt(inputResizesValue.value, 10) - RESIZE.STEP;
-    value = Math.max(value, RESIZE.MIN);
-    inputResizesValue.value = value + '%';
-    previewUploadForm.style = 'transform: scale(' + value * 0.01 + ')';
-  });
+  var setScaleHandler = function (scale) {
+    previewUploadForm.style.transform = 'scale(' + scale * 0.01 + ')';
+    inputResizesValue.value = scale + '%';
+  };
 
-  btnResizeControlsInc.addEventListener('click', function (evt) {
-    var value = parseInt(inputResizesValue.value, 10) + RESIZE.STEP;
-    value = Math.min(value, RESIZE.MAX);
-    inputResizesValue.value = value + '%';
-    previewUploadForm.style = 'transform: scale(' + value * 0.01 + ')';
-  });
-
-  effectControls.addEventListener('change', function (evt) {
-    previewUploadForm.className = previewUploadForm.classList[0] + ' effect-' + evt.target.value;
-    effectControlsData.setEffectType(evt.target.value);
-  });
+  window.initializeScale(resizeControls, setScaleHandler);
 
   function showError(elem) {
     if (!elem.classList.contains('upload-message-error')) {
@@ -218,61 +178,11 @@
 
   btnSubmit.addEventListener('click', uploadForm.onSubmit);
 
-
-  function setPinPosition(value) {
-    effectControlsLevelPin.style.left = value + '%';
-    effectControlsLevelVal.style.width = value + '%';
+  function applyFilterHandler(filter, value) {
+    previewUploadForm.className = previewUploadForm.classList[0] + ' effect-' + filter;
+    previewUploadForm.style.filter = value;
   }
 
-  effectControlsData.setEffectType = function (value) {
-    effectControlsData.chosenFilter = value;
-    effectControlsData.value = effectControlsData.VALUE_DEFAULT;
-    if (value === 'none') {
-      effectControlsLevelPin.closest('.upload-effect-level').classList.add('hidden');
-    } else {
-      effectControlsLevelPin.closest('.upload-effect-level').classList.remove('hidden');
-      setPinPosition(effectControlsData.value);
-    }
-
-    previewUploadForm.style.filter = effectControlsData.FILTER_TYPES[effectControlsData.chosenFilter]();
-  };
-
-  effectControlsData.setEffectValue = function (value) {
-    effectControlsData.value = value;
-    previewUploadForm.style.filter = effectControlsData.FILTER_TYPES[effectControlsData.chosenFilter]();
-    setPinPosition(value);
-  };
-
-  effectControlsLevelPin.addEventListener('mousedown', function (evt) {
-    evt.preventDefault();
-
-    var startCoords = {
-      x: evt.clientX
-    };
-
-    var onMouseMove = function (moveEvt) {
-      moveEvt.preventDefault();
-
-      var shift = {
-        x: startCoords.x - moveEvt.clientX
-      };
-
-      startCoords = {
-        x: moveEvt.clientX
-      };
-
-      effectControlsData.setEffectValue(Math.max(0, Math.min(100, Math.round((effectControlsLevelPin.offsetLeft - shift.x)) / 4.55)));
-    };
-
-    var onMouseUp = function (upEvt) {
-      upEvt.preventDefault();
-
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    };
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  });
+  window.initializeFilters(effectControls, applyFilterHandler);
 
 })();
