@@ -41,7 +41,6 @@
 
     elem.addEventListener('change', function (evt) {
       setEffectType(evt.target.value);
-      // callback(evt.target.value, effectControlsData.FILTER_TYPES[effectControlsData.chosenFilter]());
     });
 
 

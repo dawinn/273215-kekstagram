@@ -75,12 +75,12 @@
     window.utils.isEnterEvent(evt, btnCancelUploadForm.onCancel);
   });
 
-  var setScale = function (scale) {
+  var setScaleHandler = function (scale) {
     previewUploadForm.style.transform = 'scale(' + scale * 0.01 + ')';
     inputResizesValue.value = scale + '%';
   };
 
-  window.initializeScale(resizeControls, setScale);
+  window.initializeScale(resizeControls, setScaleHandler);
 
   function showError(elem) {
     if (!elem.classList.contains('upload-message-error')) {
@@ -178,11 +178,11 @@
 
   btnSubmit.addEventListener('click', uploadForm.onSubmit);
 
-  function applyFilter(filter, value) {
+  function applyFilterHandler(filter, value) {
     previewUploadForm.className = previewUploadForm.classList[0] + ' effect-' + filter;
     previewUploadForm.style = value;
   }
 
-  window.initializeFilters(effectControls, applyFilter);
+  window.initializeFilters(effectControls, applyFilterHandler);
 
 })();

@@ -14,12 +14,12 @@
       evt.preventDefault();
       var value = parseInt(elem.getElementsByTagName('input').scale.value, 10);
 
-      if (/dec/.test(evt.target.className)) {
+      if (evt.target.classList.contains('upload-resize-controls-button-dec')) {
         value -= RESIZE.STEP;
         value = Math.max(value, RESIZE.MIN);
       }
 
-      if (/inc/.test(evt.target.className)) {
+      if (evt.target.classList.contains('upload-resize-controls-button-inc')) {
         value += RESIZE.STEP;
         value = Math.min(value, RESIZE.MAX);
       }
