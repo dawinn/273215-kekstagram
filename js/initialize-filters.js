@@ -57,9 +57,6 @@
       }
     };
 
-    setEffectType('none');
-    callback('', '');
-
     var setEffectValue = function (value) {
       effectControlsData.value = value;
       setPinPosition(value);

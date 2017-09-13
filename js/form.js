@@ -100,8 +100,12 @@
   window.initializeFilters(effectControls, applyFilterHandler);
 
   var resetEffect = function () {
-    window.initializeScale(resizeControls, setScaleHandler);
-    window.initializeFilters(effectControls, applyFilterHandler);
+    previewUploadForm.className = previewUploadForm.classList[0];
+    previewUploadForm.style = '';
+    var levelEffectBar = effectControls.querySelector('.upload-effect-level');
+    if (!levelEffectBar.classList.contains('hidden')) {
+      levelEffectBar.classList.add('hidden').add('hidden');
+    }
     var remNode = document.querySelector('.upload-form-errorMessage');
 
     if (remNode) {
@@ -197,7 +201,7 @@
 
   // обработчик нажатия кнопки Отправить
   uploadForm.addEventListener('submit', function (evt) {
-
+    evt.preventDefault();
     function submitHandler() {
       show(uploadImage);
       hide(uploadOverlay);
@@ -206,10 +210,7 @@
       resetEffect();
     }
 
-    if (!(inputDescriptionUploadForm.validation() & inputResizesValue.validation() & inputHashTags.validation())) {
-      evt.preventDefault();
-    } else {
-
+    if (inputDescriptionUploadForm.validation() & inputResizesValue.validation() & inputHashTags.validation()) {
       window.backend.save(new FormData(uploadForm), submitHandler, window.utils.errorHandler);
     }
 
