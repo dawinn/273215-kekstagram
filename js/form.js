@@ -104,7 +104,7 @@
     previewUploadForm.style = '';
     var levelEffectBar = effectControls.querySelector('.upload-effect-level');
     if (!levelEffectBar.classList.contains('hidden')) {
-      levelEffectBar.classList.add('hidden').add('hidden');
+      levelEffectBar.classList.add('hidden');
     }
     var remNode = document.querySelector('.upload-form-errorMessage');
 

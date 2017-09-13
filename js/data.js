@@ -30,28 +30,12 @@
       pictures[i] = {
         url: 'photos/' + (i + 1) + '.jpg',
         likes: getRandomNum(COMMENTS.MIN, COMMENTS.MAX),
-        comments: getRandomArraySlice(comments, commentsRandomCount),
+        comments: window.utuls.getRandomArraySlice(comments, commentsRandomCount),
       };
     }
 
     return pictures;
   }(PICTURES_COUNT);
-
-  function getRandomItem(array) {
-    var index = Math.round(Math.random() * (array.length - 1));
-    var item = array[index];
-    array.splice(index, 1);
-    return item;
-  }
-
-  function getRandomArraySlice(array, length) {
-    var newArray = [];
-    for (var i = 0; i < length; i++) {
-      newArray[i] = getRandomItem(array);
-    }
-
-    return newArray;
-  }
 
   function getRandomNum(min, max) {
     if (min === 'undefined' || max === 'undefined') {

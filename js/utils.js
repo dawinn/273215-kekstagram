@@ -4,6 +4,13 @@
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
 
+  function getRandomItem(array) {
+    var index = Math.round(Math.random() * (array.length - 1));
+    var item = array[index];
+    array.splice(index, 1);
+    return item;
+  }
+
   window.utils = {
     isEscEvent: function (evt, action) {
       if (evt.keyCode === ESC_KEYCODE) {
@@ -27,6 +34,14 @@
 
       node.textContent = errorMessage;
       document.body.insertAdjacentElement('afterbegin', node);
+    },
+    getRandomArraySlice: function (array, length) {
+      var newArray = [];
+      for (var i = 0; i < length; i++) {
+        newArray[i] = getRandomItem(array);
+      }
+
+      return newArray;
     }
   };
 })();
