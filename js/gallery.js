@@ -30,7 +30,11 @@
 
     filtersBar.addEventListener('change', function (evt) {
       var newData = window.utils.dataSort(data, evt.target.value);
-      window.utils.debounce.bind(renderPictures(picturesBlock, newData, window.renderPicture));
+      var renderPicturesHandler = function () {
+        return renderPictures(picturesBlock, newData, window.renderPicture);
+      };
+
+      window.utils.debounce(renderPicturesHandler);
     });
 
   };
