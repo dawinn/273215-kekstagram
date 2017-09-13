@@ -199,7 +199,6 @@
     return valid;
   };
 
-  // обработчик нажатия кнопки Отправить
   uploadForm.addEventListener('submit', function (evt) {
     evt.preventDefault();
     function submitHandler() {
