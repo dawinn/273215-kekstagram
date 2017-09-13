@@ -30,7 +30,7 @@
       pictures[i] = {
         url: 'photos/' + (i + 1) + '.jpg',
         likes: getRandomNum(COMMENTS.MIN, COMMENTS.MAX),
-        comments: window.utuls.getRandomArraySlice(comments, commentsRandomCount),
+        comments: window.utils.getRandomArraySlice(comments, commentsRandomCount),
       };
     }
 

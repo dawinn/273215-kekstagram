@@ -42,6 +42,34 @@
       }
 
       return newArray;
+    },
+    debounce: function (callback) {
+      var DEBOUNCE_INTERVAL = 3000;
+      var lastTimeout;
+
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(function () {
+        callback();
+      }, DEBOUNCE_INTERVAL);
+    },
+    dataSort: function (data, param) {
+      var newData = data.slice();
+      switch (param) {
+        case 'popular':
+          return newData.sort(function (a, b) {
+            return (a.likes < b.likes ? 1 : -1);
+          });
+        case 'discussed':
+          return newData.sort(function (a, b) {
+            return (a.comments.length < b.comments.length ? 1 : -1);
+          });
+        case 'random':
+          return window.utils.getRandomArraySlice(newData, newData.length);
+        default:
+          return newData;
+      }
     }
   };
 })();

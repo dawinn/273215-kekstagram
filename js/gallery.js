@@ -29,8 +29,8 @@
     filtersBar.classList.remove('hidden');
 
     filtersBar.addEventListener('change', function (evt) {
-      var newData = dataSort(data, evt.target.value);
-      debounce.bind(renderPictures(picturesBlock, newData, window.renderPicture));
+      var newData = window.utils.dataSort(data, evt.target.value);
+      window.utils.debounce.bind(renderPictures(picturesBlock, newData, window.renderPicture));
     });
 
   };
@@ -57,35 +57,4 @@
     };
     return dataItem;
   }
-
-  var debounce = function (callback) {
-    var DEBOUNCE_INTERVAL = 300;
-    var lastTimeout;
-
-    if (lastTimeout) {
-      window.clearTimeout(lastTimeout);
-    }
-    lastTimeout = window.setTimeout(function () {
-      callback();
-    }, DEBOUNCE_INTERVAL);
-  };
-
-  var dataSort = function (data, param) {
-    var newData = data.slice();
-    switch (param) {
-      case 'popular':
-        return newData.sort(function (a, b) {
-          return (a.likes < b.likes ? 1 : -1);
-        });
-      case 'discussed':
-        return newData.sort(function (a, b) {
-          return (a.comments.length < b.comments.length ? 1 : -1);
-        });
-      case 'random':
-        return window.utils.getRandomArraySlice(newData, newData.length);
-      default:
-        return newData;
-    }
-  };
-
 })();
