@@ -49,6 +49,16 @@
       }
 
       return newArray;
+    },
+    debounce: function (func, wait) {
+      var timeout = 0;
+      return function () {
+        var args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(function () {
+          func.apply(null, args);
+        }, wait);
+      };
     }
   };
 })();

@@ -13,20 +13,20 @@
       return callback(renderBlock, newData, window.renderPicture);
     };
 
-    var debounceSet = debounce(renderPicturesHandler, 500);
+    var debounceSet = window.utils.debounce(renderPicturesHandler, 500);
     filtersBar.addEventListener('change', debounceSet);
   };
 
-  var debounce = function (func, wait) {
-    var timeout = 0;
-    return function () {
-      var args = arguments;
-      clearTimeout(timeout);
-      timeout = setTimeout(function () {
-        func.apply(null, args);
-      }, wait);
-    };
-  };
+  // var debounce = function (func, wait) {
+  //   var timeout = 0;
+  //   return function () {
+  //     var args = arguments;
+  //     clearTimeout(timeout);
+  //     timeout = setTimeout(function () {
+  //       func.apply(null, args);
+  //     }, wait);
+  //   };
+  // };
 
   var dataSort = function (data, param) {
     var newData = data.slice();
