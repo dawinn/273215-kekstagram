@@ -18,7 +18,7 @@
     MAX: 200
   };
 
-  window.data = function (length) {
+  window.getData = function (length) {
     var pictures = [];
     var commentsRandomCount;
     var comments;

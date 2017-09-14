@@ -3,7 +3,6 @@
 (function () {
 
   var picturesBlock = document.querySelector('.pictures');
-  var filtersBar = document.body.querySelector('.filters');
 
   var successHendler = function (data) {
     renderPictures(picturesBlock, data, window.renderPicture);
@@ -26,16 +25,7 @@
       }
     });
 
-    filtersBar.classList.remove('hidden');
-
-    filtersBar.addEventListener('change', function (evt) {
-      var newData = window.utils.dataSort(data, evt.target.value);
-      var renderPicturesHandler = function () {
-        return renderPictures(picturesBlock, newData, window.renderPicture);
-      };
-
-      window.utils.debounce(renderPicturesHandler);
-    });
+    window.initializeListFilters(renderPictures, data, picturesBlock);
 
   };
 
