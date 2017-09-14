@@ -17,17 +17,6 @@
     filtersBar.addEventListener('change', debounceSet);
   };
 
-  // var debounce = function (func, wait) {
-  //   var timeout = 0;
-  //   return function () {
-  //     var args = arguments;
-  //     clearTimeout(timeout);
-  //     timeout = setTimeout(function () {
-  //       func.apply(null, args);
-  //     }, wait);
-  //   };
-  // };
-
   var dataSort = function (data, param) {
     var newData = data.slice();
     switch (param) {
