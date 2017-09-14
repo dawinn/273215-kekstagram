@@ -2,13 +2,34 @@
 
 (function () {
 
-  var galleryOverlay = document.querySelector('.gallery-overlay');
-  galleryOverlay.setAttribute('tabindex', 0);
-
   var picturesBlock = document.querySelector('.pictures');
 
-  var galleryOverlayClose = galleryOverlay.querySelector('.gallery-overlay-close');
-  galleryOverlayClose.setAttribute('tabindex', 0);
+  var successHendler = function (data) {
+    renderPictures(picturesBlock, data, window.renderPicture);
+
+    picturesBlock.addEventListener('click', function (evt) {
+      evt.preventDefault();
+      var target = evt.target;
+
+      if (target !== picturesBlock) {
+        var picture = target.closest('.picture');
+        var orderPicture = picture.querySelector('img').getAttribute('data-item');
+
+        if (orderPicture >= 0 && orderPicture < data.length) {
+          window.renderGalleryOverlay(data[orderPicture]);
+        } else {
+          window.renderGalleryOverlay(getPictureData(picture));
+        }
+
+        window.showGalleryOverlay();
+      }
+    });
+
+    window.initializeListFilters(renderPictures, data, picturesBlock);
+
+  };
+
+  window.backend.load(successHendler, window.utils.errorHandler);
 
   var renderPictures = function (appendBlock, source, functionRender) {
     var fragment = document.createDocumentFragment();
@@ -18,7 +39,7 @@
         fragment.appendChild(functionRender(source[i], i));
       }
     }
-
+    appendBlock.textContent = '';
     appendBlock.appendChild(fragment);
   };
 
@@ -30,56 +51,4 @@
     };
     return dataItem;
   }
-
-  galleryOverlay.show = function () {
-    galleryOverlay.classList.remove('hidden');
-    document.addEventListener('keydown', galleryOverlay.onEscPress);
-  };
-
-  galleryOverlay.hide = function () {
-    galleryOverlay.classList.add('hidden');
-    document.removeEventListener('keydown', galleryOverlay.onEscPress);
-  };
-
-  var pictures = [];
-  var successHendler = function (data) {
-    pictures = data;
-    renderPictures(picturesBlock, data, window.renderPicture);
-  };
-
-  window.backend.load(successHendler, window.utils.errorHandler);
-
-
-  galleryOverlay.onEscPress = function (evt) {
-    window.utils.isEscEvent(evt, galleryOverlay.hide);
-  };
-
-  picturesBlock.onPictureClick = function (evt) {
-    var target = evt.target;
-
-    evt.preventDefault();
-
-    if (target !== this) {
-      var picture = target.closest('.picture');
-
-      var orderPicture = picture.querySelector('img').getAttribute('data-item');
-
-      if (orderPicture >= 0 && orderPicture < pictures.length) {
-        window.renderGalleryOverlay(pictures[orderPicture]);
-      } else {
-        window.renderGalleryOverlay(getPictureData(picture));
-      }
-
-      galleryOverlay.show();
-    }
-  };
-
-  picturesBlock.addEventListener('click', picturesBlock.onPictureClick);
-
-  galleryOverlayClose.addEventListener('click', galleryOverlay.hide);
-
-  galleryOverlayClose.addEventListener('keydown', function (evt) {
-    window.utils.isEnterEvent(evt, galleryOverlay.hide);
-  });
-
 })();
