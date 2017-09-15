@@ -4,12 +4,12 @@
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
 
-  function getRandomItem(array) {
+  var getRandomItem = function (array) {
     var index = Math.round(Math.random() * (array.length - 1));
     var item = array[index];
     array.splice(index, 1);
     return item;
-  }
+  };
 
   window.utils = {
     isEscEvent: function (evt, action) {
