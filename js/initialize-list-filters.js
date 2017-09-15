@@ -6,11 +6,12 @@
   window.initializeListFilters = function (callback, data, renderBlock) {
 
     filtersBar.classList.remove('hidden');
+    var originsData = data.slice();
 
     var renderPicturesHandler = function (evt) {
-      var newData;
-      newData = dataSort(data, evt.target.value);
-      return callback(renderBlock, newData, window.renderPicture);
+
+      data = dataSort(originsData, evt.target.value);
+      return callback(renderBlock, data, window.renderPicture);
     };
 
     var debounceSet = window.utils.debounce(renderPicturesHandler, 500);

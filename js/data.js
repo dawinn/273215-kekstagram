@@ -13,31 +13,10 @@
     'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
   ];
 
-  var COMMENTS = {
-    MIN: 15,
-    MAX: 200
-  };
+  var COMMENTS_MIN = 15;
+  var COMMENTS_MAX = 200;
 
-  window.getData = function (length) {
-    var pictures = [];
-    var commentsRandomCount;
-    var comments;
-
-    for (var i = 0; i < length; i++) {
-      commentsRandomCount = getRandomNum(1, COMMENTS_VARIANTS.length - 1);
-      comments = COMMENTS_VARIANTS.slice();
-
-      pictures[i] = {
-        url: 'photos/' + (i + 1) + '.jpg',
-        likes: getRandomNum(COMMENTS.MIN, COMMENTS.MAX),
-        comments: window.utils.getRandomArraySlice(comments, commentsRandomCount),
-      };
-    }
-
-    return pictures;
-  }(PICTURES_COUNT);
-
-  function getRandomNum(min, max) {
+  var getRandomNum = function (min, max) {
     if (min === 'undefined' || max === 'undefined') {
       return 0;
     } else {
@@ -51,7 +30,25 @@
     }
 
     return min + Math.round((max - min) * Math.random());
-  }
+  };
 
+  window.getData = function (length) {
+    var pictures = [];
+    var commentsRandomCount;
+    var comments;
+
+    for (var i = 0; i < length; i++) {
+      commentsRandomCount = getRandomNum(1, COMMENTS_VARIANTS.length - 1);
+      comments = COMMENTS_VARIANTS.slice();
+
+      pictures[i] = {
+        url: 'photos/' + (i + 1) + '.jpg',
+        likes: getRandomNum(COMMENTS_MIN, COMMENTS_MAX),
+        comments: window.utils.getRandomArraySlice(comments, commentsRandomCount),
+      };
+    }
+
+    return pictures;
+  }(PICTURES_COUNT);
 
 })();

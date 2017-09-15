@@ -6,6 +6,7 @@
 
   var successHendler = function (data) {
     renderPictures(picturesBlock, data, window.renderPicture);
+    window.initializeListFilters(renderPictures, data, picturesBlock);
 
     picturesBlock.addEventListener('click', function (evt) {
       evt.preventDefault();
@@ -25,8 +26,6 @@
       }
     });
 
-    window.initializeListFilters(renderPictures, data, picturesBlock);
-
   };
 
   window.backend.load(successHendler, window.utils.errorHandler);
@@ -34,21 +33,24 @@
   var renderPictures = function (appendBlock, source, functionRender) {
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < source.length; i++) {
-      if (typeof functionRender === 'function') {
-        fragment.appendChild(functionRender(source[i], i));
-      }
+    if (Array.isArray(source)) {
+      source.forEach(function (item, i) {
+        if (typeof functionRender === 'function') {
+          fragment.appendChild(functionRender(item, i));
+        }
+      });
     }
+
     appendBlock.textContent = '';
     appendBlock.appendChild(fragment);
   };
 
-  function getPictureData(source) {
+  var getPictureData = function (source) {
     var dataItem = {
       url: source.querySelector('img').getAttribute('src'),
       likes: source.querySelector('.picture-likes').textContent,
       comments: source.querySelector('.picture-comments').textContent
     };
     return dataItem;
-  }
+  };
 })();

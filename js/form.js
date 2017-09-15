@@ -2,25 +2,19 @@
 
 (function () {
 
-  var RESIZE = {
-    MIN: 25,
-    MAX: 100,
-    STEP: 25
-  };
+  var RESIZE_MIN = 25;
+  var RESIZE_MAX = 100;
+  var RESIZE_STEP = 25;
 
-  var DESCRIPTION = {
-    MIN: 0,
-    MAX: 140,
-  };
+  var DESCRIPTION_MIN = 0;
+  var DESCRIPTION_MAX = 140;
 
-  var HASHTAGS = {
-    MAX_LENGTH: 20,
-    COUNTS: 5
-  };
+  var HASHTAGS_MAX_LENGTH = 20;
+  var HASHTAGS_COUNTS = 5;
 
   var FILE_TYPES = ['image/gif', 'image/jpeg', 'image/png'];
 
-  var uploadForm = document.getElementById('upload-select-image');
+  var uploadForm = document.querySelector('#upload-select-image');
   var uploadImage = uploadForm.querySelector('.upload-image');
   var uploadOverlay = uploadForm.querySelector('.upload-overlay');
 
@@ -33,17 +27,17 @@
 
   var effectControls = uploadOverlay.querySelector('.upload-effect-controls');
 
-  function show(nameBlock) {
+  var show = function (nameBlock) {
     if (nameBlock.classList.contains('hidden')) {
       nameBlock.classList.remove('hidden');
     }
-  }
+  };
 
-  function hide(nameBlock) {
+  var hide = function (nameBlock) {
     if (!nameBlock.classList.contains('hidden')) {
       nameBlock.classList.add('hidden');
     }
-  }
+  };
 
   var onCancel = function () {
     show(uploadImage);
@@ -91,10 +85,10 @@
 
   window.initializeScale(resizeControls, setScaleHandler);
 
-  function applyFilterHandler(filter, value) {
+  var applyFilterHandler = function (filter, value) {
     previewUploadForm.className = previewUploadForm.classList[0] + ' effect-' + filter;
     previewUploadForm.style.filter = value;
-  }
+  };
 
   window.initializeFilters(effectControls, applyFilterHandler);
 
@@ -108,27 +102,27 @@
     window.utils.clearErrorMessage();
   };
 
-  function showError(elem) {
+  var showError = function (elem) {
     if (!elem.classList.contains('upload-message-error')) {
       elem.classList.add('upload-message-error');
     }
-  }
+  };
 
-  function resetError(elem) {
+  var resetError = function (elem) {
     if (elem.classList.contains('upload-message-error')) {
       elem.classList.remove('upload-message-error');
     }
-  }
+  };
 
   uploadForm.elements.description.validation = function () {
     var valid = true;
 
     resetError(this);
-    if (this.value.length > 0 && this.value.length < DESCRIPTION.MIN) {
+    if (this.value.length > 0 && this.value.length < DESCRIPTION_MIN) {
       showError(this);
       valid = false;
     } else {
-      if (this.value.length > DESCRIPTION.MAX) {
+      if (this.value.length > DESCRIPTION_MAX) {
         showError(this);
         valid = false;
       }
@@ -140,9 +134,9 @@
   uploadForm.elements.scale.validation = function () {
     resetError(this);
 
-    if (this.value < RESIZE.MIN
-      || this.value > RESIZE.MAX
-      || this.value % RESIZE.STEP > 0) {
+    if (this.value < RESIZE_MIN
+      || this.value > RESIZE_MAX
+      || this.value % RESIZE_STEP > 0) {
       showError(this);
       return false;
     }
@@ -166,25 +160,23 @@
     } else {
       hashArray = this.value.split(' ');
       if (hashArray.length !== 0) {
-        if (hashArray.length > HASHTAGS.COUNTS) {
-          showError(this);
+        if (hashArray.length > HASHTAGS_COUNTS) {
+
           valid = false;
+
         } else {
 
-          var obj = {};
-
-          for (var i = 0; i < hashArray.length; i++) {
-            if (hashArray[i][0] !== '#' || hashArray[i].length > HASHTAGS.MAX_LENGTH) {
-              showError(this);
-              valid = false;
-              break;
+          var uniq = {};
+          valid = !hashArray.some(function (item) {
+            if (uniq[item] === 1) {
+              return true;
             }
-            obj[hashArray[i]] = 1;
-          }
+            uniq[item] = 1;
+            return (item[0] !== '#' || item.length > HASHTAGS_MAX_LENGTH);
+          });
 
-          if (Object.keys(obj).length !== hashArray.length) {
+          if (!valid) {
             showError(this);
-            valid = false;
           }
         }
       }
@@ -196,21 +188,22 @@
   uploadForm.addEventListener('submit', function (evt) {
     evt.preventDefault();
 
-    function submitHandler() {
+    var submitHandler = function () {
       show(uploadImage);
       hide(uploadOverlay);
       document.removeEventListener('keydown', uploadOverlay.onEscPress);
       uploadForm.reset();
       resetEffect();
-    }
+    };
 
-    var elem = uploadForm.elements;
-    var valid = true;
-    for (var i = 0; i < elem.length; i++) {
-      if (typeof elem[i].validation === 'function') {
-        valid = elem[i].validation() && valid;
+    var elems = uploadForm.elements;
+    elems = Array.prototype.slice.call(elems);
+    var valid = elems.reduce(function (validTotal, elem) {
+      if (typeof elem.validation === 'function') {
+        return elem.validation() && validTotal;
       }
-    }
+      return validTotal;
+    }, true);
 
     if (valid) {
       window.backend.save(new FormData(uploadForm), submitHandler, window.utils.errorHandler);
