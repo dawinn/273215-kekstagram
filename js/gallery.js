@@ -1,7 +1,6 @@
 'use strict';
 
 (function () {
-
   var picturesBlock = document.querySelector('.pictures');
 
   var successHendler = function (data) {
@@ -14,14 +13,7 @@
 
       if (target !== picturesBlock) {
         var picture = target.closest('.picture');
-        var orderPicture = picture.querySelector('img').getAttribute('data-item');
-
-        if (orderPicture >= 0 && orderPicture < data.length) {
-          window.renderGalleryOverlay(data[orderPicture]);
-        } else {
-          window.renderGalleryOverlay(getPictureData(picture));
-        }
-
+        window.renderGalleryOverlay(getPictureData(picture));
         window.showGalleryOverlay();
       }
     });
@@ -47,10 +39,11 @@
 
   var getPictureData = function (source) {
     var dataItem = {
-      url: source.querySelector('img').getAttribute('src'),
-      likes: source.querySelector('.picture-likes').textContent,
-      comments: source.querySelector('.picture-comments').textContent
+      url: source.querySelector('img').getAttribute('data-src'),
+      likes: source.querySelector('.picture-likes').getAttribute('data-likes'),
+      comments: source.querySelector('.picture-comments').getAttribute('data-comments')
     };
     return dataItem;
   };
+
 })();
