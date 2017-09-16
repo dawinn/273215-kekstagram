@@ -1,6 +1,25 @@
 'use strict';
 
 (function () {
+  var SORT_TYPES = {
+    'recommend': function (array) {
+      return array;
+    },
+    'popular': function (array) {
+      return array.sort(function (a, b) {
+        return (b.likes - a.likes);
+      });
+    },
+    'discussed': function (array) {
+      return array.sort(function (a, b) {
+        return (b.comments.length < a.comments.length);
+      });
+    },
+    'random': function (array) {
+      return window.utils.getRandomArraySlice(array, array.length);
+    }
+  };
+
   var filtersBar = document.body.querySelector('.filters');
 
   window.initializeListFilters = function (callback, data, renderBlock) {
@@ -10,30 +29,17 @@
 
     var renderPicturesHandler = function (evt) {
 
-      data = dataSort(originsData, evt.target.value);
+      data = sortData(originsData, evt.target.value);
       return callback(renderBlock, data, window.renderPicture);
     };
 
-    var debounceSet = window.utils.debounce(renderPicturesHandler, 500);
-    filtersBar.addEventListener('change', debounceSet);
+    var debounceRenderHendler = window.utils.debounce(renderPicturesHandler, 500);
+    filtersBar.addEventListener('change', debounceRenderHendler);
   };
 
-  var dataSort = function (data, param) {
+  var sortData = function (data, param) {
     var newData = data.slice();
-    switch (param) {
-      case 'popular':
-        return newData.sort(function (a, b) {
-          return (a.likes < b.likes ? 1 : -1);
-        });
-      case 'discussed':
-        return newData.sort(function (a, b) {
-          return (a.comments.length < b.comments.length ? 1 : -1);
-        });
-      case 'random':
-        return window.utils.getRandomArraySlice(newData, newData.length);
-      default:
-        return newData;
-    }
+    return SORT_TYPES[param](newData);
   };
 
 })();

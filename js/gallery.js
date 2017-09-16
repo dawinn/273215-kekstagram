@@ -13,8 +13,8 @@
 
       if (target !== picturesBlock) {
         var picture = target.closest('.picture');
-        window.renderGalleryOverlay(getPictureData(picture));
-        window.showGalleryOverlay();
+        window.preview.render(getPictureData(picture));
+        window.preview.show();
       }
     });
 
@@ -27,9 +27,7 @@
 
     if (Array.isArray(source)) {
       source.forEach(function (item, i) {
-        if (typeof functionRender === 'function') {
-          fragment.appendChild(functionRender(item, i));
-        }
+        fragment.appendChild(functionRender(item, i));
       });
     }
 
