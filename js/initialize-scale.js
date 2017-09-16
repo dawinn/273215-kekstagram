@@ -2,9 +2,9 @@
 
 (function () {
 
-  var RESIZE_MIN = 25;
-  var RESIZE_MAX = 100;
-  var RESIZE_STEP = 25;
+  var SCALE_MIN = 25;
+  var SCALE_MAX = 100;
+  var SCALE_STEP = 25;
 
   window.initializeScale = function (elem, callback) {
 
@@ -13,13 +13,11 @@
       var value = parseInt(elem.querySelector('input').scale.value, 10);
 
       if (evt.target.classList.contains('upload-resize-controls-button-dec')) {
-        value -= RESIZE_STEP;
-        value = Math.max(value, RESIZE_MIN);
-      }
-
-      if (evt.target.classList.contains('upload-resize-controls-button-inc')) {
-        value += RESIZE_STEP;
-        value = Math.min(value, RESIZE_MAX);
+        value -= SCALE_STEP;
+        value = Math.max(value, SCALE_MIN);
+      } else {
+        value += SCALE_STEP;
+        value = Math.min(value, SCALE_MAX);
       }
 
       elem.querySelector('input').scale.value = value + '%';

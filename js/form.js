@@ -2,9 +2,9 @@
 
 (function () {
 
-  var RESIZE_MIN = 25;
-  var RESIZE_MAX = 100;
-  var RESIZE_STEP = 25;
+  var SCALE_MIN = 25;
+  var SCALE_MAX = 100;
+  var SCALE_STEP = 25;
 
   var DESCRIPTION_MIN = 0;
   var DESCRIPTION_MAX = 140;
@@ -102,42 +102,29 @@
     window.utils.clearErrorMessage();
   };
 
-  var showError = function (elem) {
-    if (!elem.classList.contains('upload-message-error')) {
-      elem.classList.add('upload-message-error');
-    }
-  };
-
-  var resetError = function (elem) {
-    if (elem.classList.contains('upload-message-error')) {
-      elem.classList.remove('upload-message-error');
-    }
+  var showError = function (elem, isShow) {
+    elem.classList.toggle('upload-message-error', isShow);
   };
 
   uploadForm.elements.description.validation = function () {
     var valid = true;
 
-    resetError(this);
-    if (this.value.length > 0 && this.value.length < DESCRIPTION_MIN) {
-      showError(this);
+    showError(this, false);
+    if (this.value.length > DESCRIPTION_MAX || (this.value.length > 0 && this.value.length < DESCRIPTION_MIN)) {
+      showError(this, true);
       valid = false;
-    } else {
-      if (this.value.length > DESCRIPTION_MAX) {
-        showError(this);
-        valid = false;
-      }
     }
 
     return valid;
   };
 
   uploadForm.elements.scale.validation = function () {
-    resetError(this);
+    showError(this, false);
 
-    if (this.value < RESIZE_MIN
-      || this.value > RESIZE_MAX
-      || this.value % RESIZE_STEP > 0) {
-      showError(this);
+    if (this.value < SCALE_MIN
+      || this.value > SCALE_MAX
+      || this.value % SCALE_STEP > 0) {
+      showError(this, true);
       return false;
     }
 
@@ -149,52 +136,51 @@
     var hashArray = [];
     var regex = new RegExp(/([^$A-Za-z0-9А-Яа-я_# ]+)/);
 
-    resetError(this);
+    showError(this, false);
+    this.value = this.value.trim();
+    this.value = this.value.replace(/(\s\s*)/g, ' ');
     if (this.value.length === 0) {
-      return valid;
+      return true;
     }
 
     if (regex.test(this.value)) {
-      showError(this);
-      valid = false;
-    } else {
-      hashArray = this.value.split(' ');
-      if (hashArray.length !== 0) {
-        if (hashArray.length > HASHTAGS_COUNTS) {
+      showError(this, true);
+      return false;
+    }
 
-          valid = false;
+    hashArray = this.value.split(' ');
+    if (hashArray.length > HASHTAGS_COUNTS) {
+      showError(this, true);
+      return false;
+    }
 
-        } else {
+    var uniq = {};
 
-          var uniq = {};
-          valid = !hashArray.some(function (item) {
-            if (uniq[item] === 1) {
-              return true;
-            }
-            uniq[item] = 1;
-            return (item[0] !== '#' || item.length > HASHTAGS_MAX_LENGTH);
-          });
-
-          if (!valid) {
-            showError(this);
-          }
-        }
+    valid = !hashArray.some(function (item) {
+      if (uniq[item] === 1) {
+        return true;
       }
+      uniq[item] = 1;
+      return (item[0] !== '#' || item.length > HASHTAGS_MAX_LENGTH);
+    });
+
+    if (!valid) {
+      showError(this, true);
     }
 
     return valid;
   };
 
+  var submitHandler = function () {
+    show(uploadImage);
+    hide(uploadOverlay);
+    document.removeEventListener('keydown', uploadOverlay.onEscPress);
+    uploadForm.reset();
+    resetEffect();
+  };
+
   uploadForm.addEventListener('submit', function (evt) {
     evt.preventDefault();
-
-    var submitHandler = function () {
-      show(uploadImage);
-      hide(uploadOverlay);
-      document.removeEventListener('keydown', uploadOverlay.onEscPress);
-      uploadForm.reset();
-      resetEffect();
-    };
 
     var elems = uploadForm.elements;
     elems = Array.prototype.slice.call(elems);
