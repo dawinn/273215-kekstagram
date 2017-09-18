@@ -17,9 +17,9 @@
         value = Math.max(value, SCALE_MIN);
       } else {
         if (evt.target.classList.contains('upload-resize-controls-button-inc')) {
- +        value += SCALE_STEP;
- +        value = Math.min(value, SCALE_MAX);
- +      }
+          value += SCALE_STEP;
+          value = Math.min(value, SCALE_MAX);
+        }
       }
 
       elem.querySelector('input').scale.value = value + '%';
