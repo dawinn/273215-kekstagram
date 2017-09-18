@@ -28,15 +28,11 @@
   var effectControls = uploadOverlay.querySelector('.upload-effect-controls');
 
   var show = function (nameBlock) {
-    if (nameBlock.classList.contains('hidden')) {
-      nameBlock.classList.remove('hidden');
-    }
+    nameBlock.classList.toggle('hidden', false);
   };
 
   var hide = function (nameBlock) {
-    if (!nameBlock.classList.contains('hidden')) {
-      nameBlock.classList.add('hidden');
-    }
+    nameBlock.classList.toggle('hidden', true);
   };
 
   var onCancel = function () {
